@@ -15,7 +15,15 @@ router.use(morgan('combined'));
 // Single player info below
 router.get('/:name', (req, res, next) => {
     let playerName = req.params.name;
-    q.getPlayerData(playerName).then(response => res.json({ PlayerName: playerName, MatchesPlayed: response.relationships.matches.data.length }));
+    q.getPlayerData(playerName).then(response => {
+        if (response instanceof Error){
+            next(response)
+        }
+        else {
+            console.log('get matches', q.getRecentMatches(response))
+            res.json({ PlayerName: playerName, LastFiveMatches: q.getRecentMatches(response), TotalMatchesPlayed: response.relationships.matches.data.length })
+        }
+    });
 })
 
 router.use((req, res, next) => {
