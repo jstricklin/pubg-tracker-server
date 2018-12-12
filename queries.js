@@ -11,6 +11,7 @@ module.exports = {
                 console.log('player in cache', res)
                 return res
             } else {
+                console.log('Player not in cache - Fetching!')
                 return fetch(`${baseURL}${playerName}`, {
                 method: 'GET',
                 json: true,
