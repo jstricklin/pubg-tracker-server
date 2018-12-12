@@ -20,8 +20,9 @@ router.get('/:name', (req, res, next) => {
             next(response)
         }
         else {
-            console.log('get matches', q.getRecentMatches(response))
-            res.json({ PlayerName: playerName, LastFiveMatches: q.getRecentMatches(response), TotalMatchesPlayed: response.relationships.matches.data.length })
+            q.getRecentMatches(response).then(matchArr => {
+                res.json({ PlayerName: playerName, LastFiveMatches: matchArr, TotalMatchesPlayed: response.relationships.matches.data.length })
+            })
         }
     });
 })
