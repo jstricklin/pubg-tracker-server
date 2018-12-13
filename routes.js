@@ -15,13 +15,31 @@ router.use(morgan('combined'));
 // Single player info below
 router.get('/:name', (req, res, next) => {
     let playerName = req.params.name;
+
+    let playerData = { PlayerName: playerName }     //initialize playerData object
     q.getPlayerData(playerName).then(response => {
         if (response instanceof Error){
             next(response)
         }
         else {
             q.getRecentMatches(response).then(matchArr => {
-                res.json({ PlayerName: playerName, LastFiveMatches: matchArr, TotalMatchesPlayed: response.relationships.matches.data.length })
+                // raw matches below
+                let assetsArr = [];
+                let matchTelemArr = []
+                // console.log('response', response)
+                playerData.TotalMatchesPlayed = response.relationships.matches.data.length;
+                //todo add match id's to assets array to send to telemetry end point via q.getMatchTelemetry
+                // matchArr.map(match => assetsArr.push(match.data.relationships.assets.data[0].id));
+                matchArr.map(match => {
+                    assetsArr.push(match.included.filter( data => data.type === 'asset' && data.id === match.data.relationships.assets.data[0].id)[0])
+                })
+                // console.log('assets arr', assetsArr)
+                q.getMatchTelemetry(assetsArr) // get telemetry
+                    .then(res => res.map(telem => matchTelemArr.push(telem)))
+                    .then(response => {
+                        playerData.matchTelemetry = matchTelemArr[0]; res.json(playerData)
+                    })
+
             })
         }
     });
