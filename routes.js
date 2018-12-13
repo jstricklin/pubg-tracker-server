@@ -28,7 +28,6 @@ router.get('/:name', (req, res, next) => {
                 let matchTelemArr = []
                 // console.log('response', response)
                 playerData.TotalMatchesPlayed = response.relationships.matches.data.length;
-                //todo add match id's to assets array to send to telemetry end point via q.getMatchTelemetry
                 // matchArr.map(match => assetsArr.push(match.data.relationships.assets.data[0].id));
                 matchArr.map(match => {
                     assetsArr.push(match.included.filter( data => data.type === 'asset' && data.id === match.data.relationships.assets.data[0].id)[0])
@@ -37,7 +36,22 @@ router.get('/:name', (req, res, next) => {
                 q.getMatchTelemetry(assetsArr) // get telemetry
                     .then(res => res.map(telem => matchTelemArr.push(telem)))
                     .then(response => {
-                        playerData.matchTelemetry = matchTelemArr[0]; res.json(playerData)
+                        //sort telemetry below
+                        let attacks = []
+                        let hits = []
+                        matchTelemArr[0].map(telem => {
+                            if (telem.attacker) {
+                                if (telem.attacker.name === playerName && telem.victim) hits.push(telem)
+                                else if (telem.attacker.name === playerName) attacks.push(telem)
+                            }
+                        })
+                        console.log('attacks', attacks.length)
+                        console.log('hits', hits.length)
+                        console.log('accuracy', hits.length / attacks.length)
+                        // console.log(matchTelemArr[0].filter(telem => { if ( telem.attacker ) return telem }).filter(attack => attack.attacker.name === playerName))
+                        // playerData.Hits = hits;
+                        playerData.Accuracy = (hits.length/attacks.length * 100).toFixed(2)
+                        res.json(playerData)
                     })
 
             })
