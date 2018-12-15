@@ -30,7 +30,7 @@ module.exports = {
     getRecentMatches: (data) => {
         let matches = []
         data.relationships.matches.data.map(( match, i ) => {
-            if (i < 5) {
+            if (i < 25) {
                 // console.log(match.id)
                 matches.push(fetch(`${matchURL}${match.id}`, {
                     method: 'GET',
@@ -45,7 +45,8 @@ module.exports = {
     getMatchTelemetry: (matchArr) => {
         // console.log('url', matchArr[0].attributes.URL)
         const matchPromises = [];
-        matchArr.map((match, i) => matchPromises.push(fetch(`${match.attributes.URL}`, {
+        // console.log('match arr', matchArr)
+        matchArr.map((match) => matchPromises.push(fetch(`${match.attributes.URL}`, {
             method: 'GET',
             json: true,
             headers: { 'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json', 'Authorization': `Bearer ${process.env.API_KEY}`
