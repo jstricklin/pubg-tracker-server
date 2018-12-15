@@ -24,13 +24,13 @@ module.exports = {
                     .then(res => res.json())
                     .then(json => { cache.cachePlayerData(playerName, json.data[0]); return json.data[0] })
             }
-            // console.log('pre return player', res)
         }).catch(err => new Error('No player data found...'))
     },
     getRecentMatches: (data) => {
         let matches = []
         data.relationships.matches.data.map(( match, i ) => {
-            if (i < 25) {
+            //change below to adjust returned match quantity
+            if (i < 50) {
                 // console.log(match.id)
                 matches.push(fetch(`${matchURL}${match.id}`, {
                     method: 'GET',
