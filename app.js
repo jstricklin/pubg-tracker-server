@@ -5,7 +5,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const routes = require('./routes')
 
-app.use('/player', routes)
+app.use('/shard', routes)
 app.use(cors())
 app.use(morgan('combined'))
 

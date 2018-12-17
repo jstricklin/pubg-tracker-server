@@ -14,16 +14,24 @@ router.use(cors());
 router.use(morgan('combined'));
 
 // Single player info below
-router.get('/:name', (req, res, next) => {
+router.get('/:shard/player/:name', (req, res, next) => {
     let playerName = req.params.name;
+    let shard = req.params.shard;
+    console.log('hit')
+    console.log('req params', req.params)
 
     let playerData = { PlayerName: playerName }     //initialize playerData object
-    q.getPlayerData(playerName).then(response => {
+    q.getPlayerData(shard, playerName).then(response => {
         if (response instanceof Error){
-            next(response)
+            next({ message: 'Player not found...' })
+        }
+        if (response.relationships.matches.data.length == 0) {
+            console.log('no matches', response.relationships.matches)
+            next({ message: 'No recent match data found' })
         }
         else {
-            q.getRecentMatches(response).then(matchArr => {
+            console.log('matches found', response.relationships.matches)
+            q.getRecentMatches(shard, response).then(matchArr => {
                 // raw matches below
                 let assetsArr = [];
                 let matchTelemArr = [];
@@ -140,6 +148,7 @@ router.get('/:name', (req, res, next) => {
                         // prevMatch.attackCount = missedAttacks.length;
                         // prevMatch.hitCount = hits.length;
                         // prevMatch.hits = hits;
+                        // prevMatch.telemetry = response; //respond with all telemetry
                         prevMatch.mapName = matchArr[0].data.attributes.mapName
                         prevMatch.matchId = matchArr[0].data.id
                         prevMatch.stats = allMatchStats[0]

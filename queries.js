@@ -3,19 +3,19 @@ const cache = require('./cache.js')
 
 require('dotenv').config();
 //baseURL='https://api.pubg.com/shards'
-const baseURL='https://api.pubg.com/shards/psn/players?filter[playerNames]=';
-const matchURL='https://api.pubg.com/shards/psn/matches/'
+const baseURL='https://api.pubg.com/shards';
+const matchURL='https://api.pubg.com/shards';
 const telemetryURL=''
 
 module.exports = {
-    getPlayerData: (playerName) => {
+    getPlayerData: (shard, playerName) => {
         return cache.getCachedPlayerData(playerName).then(res => {
             if (res !== null) {
                 // console.log('player in cache', res)
                 return res
             } else {
                 // console.log('Player not in cache - Fetching!')
-                return fetch(`${baseURL}${playerName}`, {
+                return fetch(`${baseURL}/${shard}/players?filter[playerNames]=${playerName}`, {
                     method: 'GET',
                     mode:'cors',
                     json: true,
@@ -23,17 +23,18 @@ module.exports = {
                     }
                 })
                     .then(res => res.json())
-                    .then(json => { cache.cachePlayerData(playerName, json.data[0]); return json.data[0] })
+                    .then(json => { console.log(json); cache.cachePlayerData(playerName, json.data[0]); return json.data[0] })
             }
         }).catch(err => new Error(err))
     },
-    getRecentMatches: (data) => {
+    getRecentMatches: (shard, data) => {
+    // console.log('data', data.relationships)
         let matches = []
         data.relationships.matches.data.map(( match, i ) => {
             //change below to adjust returned match quantity
             if (i) {
                 // console.log(match.id)
-                matches.push(fetch(`${matchURL}${match.id}`, {
+                matches.push(fetch(`${matchURL}/${shard}/matches/${match.id}`, {
                     method: 'GET',
                     json: true,
                     headers: { 'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json', 'Authorization': `Bearer ${process.env.API_KEY}`
