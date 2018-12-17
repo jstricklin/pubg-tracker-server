@@ -38,23 +38,54 @@ router.get('/:name', (req, res, next) => {
                 // let pAttacks = []
                 // let pHits = []
                 let kills = []
+                let soloKills = 0
+                let soloDeaths = 0
+                let duoKills = 0
+                let duoDeaths= 0
+                let squadKills = 0
+                let squadDeaths = 0
                 let killer = []
                 let knocks = []
                 let knocker = []
                 // let pKills = []
                 let deaths = []
+                // let allDeaths = 0
                 // let pDeath = []
                 let prevMatch = {}
                 let prevMatchArr = []
                 let teamMates = []
                 let allMatchStats = []
+                let soloKD = []
+                let duoKD = []
+                let squadKD = []
                 //get general stats
                 // console.log(matchArr[0])
                 //get last match telemetry below
                 let prevMatchTempArr = []
                 prevMatchTempArr.push(assetsArr[0])
+                // console.log(matchArr.length)
                 allMatchStats = matchArr.map(match => match.included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats)
-                // console.log(matchArr[0].included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats)
+                allMatchStats.map(( stats, i ) => {
+                    switch(matchArr[i].data.attributes.gameMode) {
+                        case ('solo') : {
+                                soloKills += stats.kills
+                                if (stats.deathType !== '') soloDeaths++
+                            }
+                            break
+                        case ('duo') : {
+                                duoKills += stats.kills
+                                if (stats.deathType !== '') duoDeaths++
+                            }
+                            break
+                        case ('squad') : {
+                                squadKills += stats.kills
+                                if (stats.deathType !== '') squadDeaths++
+                            }
+                            break
+                    }
+                })
+                console.log('kills, solo duo squad', soloKills, duoKills, squadKills)
+                console.log('deaths, solo duo squad', soloDeaths, duoDeaths, squadDeaths)
                 q.getMatchTelemetry(prevMatchTempArr).then(response => {
                     response.map(data => {
                         //get prev match telemetry below
@@ -120,6 +151,9 @@ router.get('/:name', (req, res, next) => {
                         prevMatch.knocks = knocks;
                         prevMatch.knocker = knocker;
                         playerData.prevMatch = prevMatch;
+                        playerData.soloKD = (soloKills/soloDeaths).toFixed(2)
+                        playerData.duoKD = (duoKills/duoDeaths).toFixed(2)
+                        playerData.squadKD = (squadKills/squadDeaths).toFixed(2)
                         res.json(playerData);
                     })
                     // let teamNum = telem.filter(data => data.character && data.character.name == playerName)[0].character.teamId
