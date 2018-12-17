@@ -17,8 +17,9 @@ module.exports = {
                 // console.log('Player not in cache - Fetching!')
                 return fetch(`${baseURL}${playerName}`, {
                     method: 'GET',
+                    mode:'cors',
                     json: true,
-                    headers: { 'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json', 'Authorization': `Bearer ${process.env.API_KEY}`
+                    headers: { 'Access-Control-Allow-Origin' : '*', 'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json', 'Authorization': `Bearer ${process.env.API_KEY}`
                     }
                 })
                     .then(res => res.json())
