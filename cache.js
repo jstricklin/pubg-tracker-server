@@ -2,7 +2,7 @@ const bluebird = require('bluebird');
 const redis = require('redis');
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_URL || 6379);
 
 client.keysAsync('*').then( res => console.log('start keys', res) ) // check keys in redis on save
 
