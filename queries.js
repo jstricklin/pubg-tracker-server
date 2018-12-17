@@ -24,7 +24,7 @@ module.exports = {
                     .then(res => res.json())
                     .then(json => { cache.cachePlayerData(playerName, json.data[0]); return json.data[0] })
             }
-        }).catch(err => new Error('No player data found...'))
+        }).catch(err => new Error(err))
     },
     getRecentMatches: (data) => {
         let matches = []
