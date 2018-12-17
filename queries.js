@@ -30,7 +30,7 @@ module.exports = {
         let matches = []
         data.relationships.matches.data.map(( match, i ) => {
             //change below to adjust returned match quantity
-            if (i < 50) {
+            if (i) {
                 // console.log(match.id)
                 matches.push(fetch(`${matchURL}${match.id}`, {
                     method: 'GET',
