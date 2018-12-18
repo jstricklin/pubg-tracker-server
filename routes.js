@@ -24,8 +24,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
     q.getPlayerData(shard, playerName).then(response => {
         if (response instanceof Error){
             next({ message: 'Player not found...' })
-        }
-        if (response.relationships.matches.data.length == 0) {
+        } else if (response.relationships.matches.data.length == 0) {
             console.log('no matches', response.relationships.matches)
             next({ message: 'No recent match data found' })
         }
@@ -35,10 +34,16 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 // raw matches below
                 let assetsArr = [];
                 let matchTelemArr = [];
+                let prevMatchArr = []
                 playerData.TotalMatchesPlayed = response.relationships.matches.data.length;
                 matchArr.map(match => {
-                    assetsArr.push(match.included.filter( data => data.type === 'asset' && data.id === match.data.relationships.assets.data[0].id)[0])
+                    let matchData = match.included.filter( data => data.type === 'asset' && data.id === match.data.relationships.assets.data[0].id)[0]
+                    // populate recent matches below
+                    let winPlace = match.included.filter(stat => stat.type == 'participant' && stat.attributes.stats.name == playerName)[0].attributes.stats.winPlace
+                    prevMatchArr.push({ match: match.data.id, winPlace: winPlace, winner: winPlace == 1, attributes: match.data.attributes, stats: match.included.filter(stat => stat.type == 'participant' && stat.attributes.stats.name == playerName) })
+                    assetsArr.push(matchData)
                 })
+                // ADD RECVENT MATVCH PERECENT
                 let missedAttacks = []
                 let enemiesHit = []
                 let attackers = []
@@ -60,7 +65,6 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 // let allDeaths = 0
                 // let pDeath = []
                 let prevMatch = {}
-                let prevMatchArr = []
                 let teamMates = []
                 let allMatchStats = []
                 let soloKD = []
@@ -119,7 +123,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                                         })
                                     }
                                 }
-                                if (telem.victim && telem.victim.name === playerName) {
+                                if (telem.victim && telem.victim.name === playerName && telem.attacker.name !== playerName) {
                                     // console.log('hurt', telem)
                                     if (telem.dBNOId) {
                                         knocker.push(telem)
@@ -142,7 +146,9 @@ router.get('/:shard/player/:name', (req, res, next) => {
                                 teamMates.push(telem.character.name)
                             }
                         })
-                        prevMatch.accuracy = (hits.length / (missedAttacks.length + hits.length) * 100).toFixed(2);
+
+                        let accuracy = (hits.length / (missedAttacks.length + hits.length) * 100).toFixed(2);
+                        prevMatch.accuracy = isNaN(accuracy) ? '0.0' : accuracy;
                         prevMatch.teamMates = teamMates
                         // prevMatch.missedAttacks = missedAttacks;
                         // prevMatch.attackCount = missedAttacks.length;
@@ -160,121 +166,13 @@ router.get('/:shard/player/:name', (req, res, next) => {
                         prevMatch.knocks = knocks;
                         prevMatch.knocker = knocker;
                         playerData.prevMatch = prevMatch;
-                        playerData.soloKD = (soloKills/soloDeaths).toFixed(2)
-                        playerData.duoKD = (duoKills/duoDeaths).toFixed(2)
-                        playerData.squadKD = (squadKills/squadDeaths).toFixed(2)
+                        playerData.prevMatches = prevMatchArr;
+                        playerData.soloKD = isNaN(soloKills/soloDeaths) ? '0.00' : (soloKills/soloDeaths).toFixed(2)
+                        playerData.duoKD = isNaN(duoKills/duoDeaths) ? '0.00' : (duoKills/duoDeaths).toFixed(2)
+                        playerData.squadKD = isNaN(squadKills/squadDeaths) ? '0.00' : (squadKills/squadDeaths).toFixed(2)
                         res.json(playerData);
                     })
-                    // let teamNum = telem.filter(data => data.character && data.character.name == playerName)[0].character.teamId
-                    // telem.map(data => data.character && data.character.name !== playerName && data.character.teamId === teamNum && !teamMates.includes(data.character.name) ? teamMates.push(data.character.name) : data)
                 })
-                // console.log('assets arr', assetsArr)
-                //q.getMatchTelemetry(assetsArr) // get telemetry
-                //    .then(res => res.map(telem => matchTelemArr.push(telem)))
-                //    .then(response => {
-                //        //sort telemetry below
-                //        let attacks = []
-                //        let hits = []
-                //        let pAttacks = []
-                //        let pHits = []
-                //        let kills = []
-                //        let pKills = []
-                //        let deaths = []
-                //        let pDeath = []
-                //        let prevMatch = {}
-                //        let prevMatchArr = []
-                //        let teamMates = []
-                //        //sort recent match data below for all recent matches and prev match
-                //        matchTelemArr.map((el, i) => {
-                //            if (i == 0) {
-                //                let teamNum = el.filter(telem => telem.character && telem.character.name == playerName)[0].character.teamId
-                //                el.map(telem => telem.character && telem.character.name !== playerName && telem.character.teamId === teamNum && !teamMates.includes(telem.character.name) ? teamMates.push(telem.character.name) : telem)
-                //            }
-                //            //find base prev match survival times etc below
-                //            el.map((telem, i) => {
-                //                if (telem.character) {
-                //                    // console.log('base telem', telem)
-                //                }
-                //            })
-                //            if (i < 6) {
-                //                //populate previous match list below
-                //                prevMatchArr.push({ id: matchArr[i].data.id, attributes: { MatchType: matchArr[i].data.attributes.gameMode, URL: assetsArr[i].attributes.URL, map: matchArr[i].data.attributes.mapName, timeStart: matchArr[i].data.attributes.createdAt } })
-                //                // prevMatch.MatchTelemetry = el
-                //                // prevMatch.Kills =
-                //            }
-                //            el.map(telem => {
-                //            if (i < 1 && telem.characters){
-                //                // console.log('telem', matchArr[i].data.attributes)
-                //                //get teammates below
-                //                // console.log('telem', telem)
-                //            }
-                //            //get kills below
-                //            if (telem.killer && telem.killer.name === playerName && telem.victim.name !== playerName) {
-                //                if (i == 0) {
-                //                    pKills.push(telem)
-                //                }
-                //                kills.push({ MatchType: matchArr[i].data.attributes.gameMode, data: telem })
-                //                // console.log('kill!', telem)
-                //            }
-                //            if (telem.killer && telem.victim.name == playerName) {
-                //                // console.log('deeeeath', telem)
-                //                if (i == 0) {
-                //                    pDeath.push(telem)
-                //                }
-                //                deaths.push({ MatchType: matchArr[i].data.attributes.gameMode, data: telem })
-                //            }
-
-                //            //get attacks and hits below
-                //            if (telem.attackId && telem.attacker) {
-                //                if (telem.attacker.name === playerName) {
-                //                    if (telem.attackType === 'Weapon') {
-                //                        if (i == 0) {
-                //                            pAttacks.push(telem)
-                //                        }
-                //                        attacks.push(telem)
-                //                    }
-                //                    if (telem.victim && telem.victim.name !== playerName){
-                //                        // console.log('victim..?', telem)
-                //                        if (i == 0) {
-                //                            pHits.push(telem)
-                //                        }
-                //                        hits.push(telem)
-                //                    }
-                //                }
-                //            }
-                //            })
-                //        })
-                // console.log('prevMatches', prevMatchArr)
-                //last match data
-
-                //                         prevMatch.TimeStart = matchArr[0].data.attributes.createdAt
-                //                         prevMatch.MatchType = matchArr[0].data.attributes.gameMode
-                //                         prevMatch.Shard = matchArr[0].data.attributes.shardId
-                //                         prevMatch.Map = matchArr[0].data.attributes.mapName
-                //                         // prevMatch.TimeSurvived = // look for type : participant for relevant data in postman
-                //                         // check teammates
-                //                         let prevAccuracy = ((pHits.length / pAttacks.length) * 100).toFixed(2)
-                //                         pDeath ? prevMatch.Killer = pDeath[0] : prevMatch.Winner = true
-                //                         prevMatch.KillCount = pKills.length
-                //                         prevMatch.KillData = pKills
-                //                         prevMatch.TeamMates = teamMates ? teamMates : null
-                //                         prevMatch.Accuracy = isNaN(prevAccuracy) ? 0 : prevAccuracy
-                //                         prevMatch.matchID = matchArr[0].data.id
-                //                         playerData.PrevMatch = prevMatch
-                //                         playerData.PrevMatchList = prevMatchArr
-                //                         let kDSquad = (kills.filter(kill => kill.MatchType == 'squad').length / deaths.filter(death => death.MatchType == 'squad').length).toFixed(2)
-                //                         let kDDuo = (kills.filter(kill => kill.MatchType == 'duo').length / deaths.filter(death => death.MatchType == 'duo').length).toFixed(2)
-                //                         let kDSolo = (kills.filter(kill => kill.MatchType == 'solo').length / deaths.filter(death => death.MatchType == 'solo').length).toFixed(2)
-                //                         playerData.KDSquad = isNaN(kDSquad) ? 0 : kDSquad;
-                //                         playerData.KDDuo = isNaN(kDDuo) ? 0 : kDDuo;
-                //                         playerData.KDSolo = isNaN(kDSolo) ? 0 : kDSolo;   // playerData.Hits = hits.length;
-                //                         // playerData.pattacks = pAttacks;
-                //                         // playerData.phits = pHits;
-                //                         // playerData.prevMatches = matchTelemArr[0]
-                //                         // playerData.prevMatches = matchArr[0]
-                //                         playerData.AverageAccuracy = (hits.length/attacks.length * 100).toFixed(2)
-                //                         res.json(playerData)
-                //                     })
             })
         }
     });
