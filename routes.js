@@ -80,19 +80,19 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 allMatchStats.map(( stats, i ) => {
                     switch(matchArr[i].data.attributes.gameMode) {
                         case ('solo') : {
-                                soloKills += stats.kills
-                                if (stats.deathType !== '') soloDeaths++
-                            }
+                            soloKills += stats.kills
+                            if (stats.deathType !== '') soloDeaths++
+                        }
                             break
                         case ('duo') : {
-                                duoKills += stats.kills
-                                if (stats.deathType !== '') duoDeaths++
-                            }
+                            duoKills += stats.kills
+                            if (stats.deathType !== '') duoDeaths++
+                        }
                             break
                         case ('squad') : {
-                                squadKills += stats.kills
-                                if (stats.deathType !== '') squadDeaths++
-                            }
+                            squadKills += stats.kills
+                            if (stats.deathType !== '') squadDeaths++
+                        }
                             break
                     }
                 })
@@ -182,13 +182,20 @@ router.get('/:shard/player/:name', (req, res, next) => {
 router.get('/:shard/player/:playerName/match/:telemURL/', (req, res, next) => {
     let shard = req.params.shard;
     let playerName = req.params.playerName
-    let telemURL = req.params.telemURL
+    let telemURL = []
+    telemURL.push(req.params.telemURL)
 
+    console.log('match route hit')
+
+    q.getMatchTelemetry(telemURL).then(response => {
+        console.log('get match res', response)
+       res.json(response)
+    })
 })
 
-router.use((req, res, next) => {
-    let err = new Error('Enter a valid player name for that sweet player data');
-    next(err);
-})
+    router.use((req, res, next) => {
+        let err = new Error('Enter a valid player route for that sweet data');
+        next(err);
+    })
 
-module.exports = router;
+    module.exports = router;

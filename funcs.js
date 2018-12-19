@@ -1,5 +1,4 @@
-module.exports = {
-    getMatchData: (data) => {
+const q = require('./queries.js')
 
-    }
+module.exports = {
 }
