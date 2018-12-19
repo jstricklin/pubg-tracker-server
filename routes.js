@@ -25,11 +25,11 @@ router.get('/:shard/player/:name', (req, res, next) => {
         if (response instanceof Error){
             next({ message: 'Player not found...' })
         } else if (response.relationships.matches.data.length == 0) {
-            console.log('no matches', response.relationships.matches)
+            // console.log('no matches', response.relationships.matches)
             next({ message: 'No recent match data found' })
         }
         else {
-            console.log('matches found', response.relationships.matches)
+            // console.log('matches found', response.relationships.matches)
             q.getRecentMatches(shard, response).then(matchArr => {
                 // raw matches below
                 let assetsArr = [];
@@ -40,7 +40,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                     let matchData = match.included.filter( data => data.type === 'asset' && data.id === match.data.relationships.assets.data[0].id)[0]
                     // populate recent matches below
                     let winPlace = match.included.filter(stat => stat.type == 'participant' && stat.attributes.stats.name == playerName)[0].attributes.stats.winPlace
-                    prevMatchArr.push({ match: match.data.id, winPlace: winPlace, winner: winPlace == 1, attributes: match.data.attributes, stats: match.included.filter(stat => stat.type == 'participant' && stat.attributes.stats.name == playerName) })
+                    prevMatchArr.push({ matchId: match.data.id, telemetryURL: match.included.filter(data => data.type == 'asset')[0].attributes.URL, winPlace: winPlace, winner: winPlace == 1, attributes: match.data.attributes, stats: match.included.filter(stat => stat.type == 'participant' && stat.attributes.stats.name == playerName)[0] })
                     assetsArr.push(matchData)
                 })
                 // ADD RECVENT MATVCH PERECENT
@@ -106,6 +106,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                         //sort prev telem data below
                         let teamMates = []
                         data.map(telem => {
+                            //get attacks below
                             if (telem.attacker) {
                                 if (telem.attacker.name === playerName){
                                     // console.log('attack', telem)
@@ -176,6 +177,13 @@ router.get('/:shard/player/:name', (req, res, next) => {
             })
         }
     });
+})
+
+router.get('/:shard/player/:playerName/match/:telemURL/', (req, res, next) => {
+    let shard = req.params.shard;
+    let playerName = req.params.playerName
+    let telemURL = req.params.telemURL
+
 })
 
 router.use((req, res, next) => {
