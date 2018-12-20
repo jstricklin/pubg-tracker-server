@@ -30,7 +30,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
         }
         else {
             // console.log('matches found', response.relationships.matches)
-            q.getRecentMatches(shard, response).then(matchArr => {
+            q.getMatchData(shard, response.relationships.matches.data).then(matchArr => {
                 // raw matches below
                 let assetsArr = [];
                 let matchTelemArr = [];
@@ -179,15 +179,15 @@ router.get('/:shard/player/:name', (req, res, next) => {
     });
 })
 
-router.get('/:shard/player/:playerName/match/:telemURL/', (req, res, next) => {
+router.get('/:shard/player/:playerName/match/:matchId/', (req, res, next) => {
     let shard = req.params.shard;
     let playerName = req.params.playerName
-    let telemURL = []
-    telemURL.push(req.params.telemURL)
+    let matchId = []
+    matchId.push({id: req.params.matchId})
 
     console.log('match route hit')
 
-    q.getMatchTelemetry(telemURL).then(response => {
+    q.getMatchData(shard, matchId).then(response => {
         console.log('get match res', response)
        res.json(response)
     })

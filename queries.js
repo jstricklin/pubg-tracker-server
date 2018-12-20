@@ -27,20 +27,19 @@ module.exports = {
             }
         }).catch(err => new Error(err))
     },
-    getRecentMatches: (shard, data) => {
-    // console.log('data', data.relationships)
+    getMatchData: (shard, data) => {
+    console.log('data', data)
         let matches = []
-        data.relationships.matches.data.map(( match, i ) => {
+        data.map(( match ) => {
             //change below to adjust returned match quantity
-            if (i) {
                 // console.log(match.id)
+                // console.log('match data?', match, match.id)
                 matches.push(fetch(`${matchURL}/${shard}/matches/${match.id}`, {
                     method: 'GET',
                     json: true,
                     headers: { 'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json', 'Authorization': `Bearer ${process.env.API_KEY}`
                     }
                 }).then( res => res.json()).then(json => {/*console.log('raw json', json); */ return json}))
-            } else return
         })
         return Promise.all(matches).then(res => res)
     },
