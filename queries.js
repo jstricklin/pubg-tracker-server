@@ -23,12 +23,12 @@ module.exports = {
                     }
                 })
                     .then(res => res.json())
-                    .then(json => { console.log(json); cache.cachePlayerData(playerName, json.data[0]); return json.data[0] })
+                    .then(json => { cache.cachePlayerData(playerName, json.data[0]); return json.data[0] })
             }
         }).catch(err => new Error(err))
     },
     getMatchData: (shard, data) => {
-    console.log('data', data)
+    // console.log('data', data)
         let matches = []
         data.map(( match ) => {
             //change below to adjust returned match quantity
