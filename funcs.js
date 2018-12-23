@@ -49,6 +49,8 @@ module.exports = {
         })
         let stats = {}
         stats.soloKD = isNaN(soloKills / soloDeaths) ? '0.0' : (soloKills/soloDeaths).toFixed(2)
+        stats.duoKD = isNaN(duoKills / duoDeaths) ? '0.0' : (duoKills/duoDeaths).toFixed(2)
+        stats.squadKD = isNaN(squadKills / squadDeaths) ? '0.0' : (squadKills/squadDeaths).toFixed(2)
         console.log('stats', stats)
         console.log('kills, solo duo squad', soloKills, duoKills, squadKills)
         console.log('deaths, solo duo squad', soloDeaths, duoDeaths, squadDeaths)

@@ -36,7 +36,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 //populate previous match list below
                 let prevMatchList =[]
                 matchData.map((match, i) => {
-                    if (i < 25) {
+                    if (i < 15) {
                         prevMatchList.push({ attributes: match.data.attributes, id: match.data.id, stats: match.included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats })
                     }
                 })
