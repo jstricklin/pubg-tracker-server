@@ -1,6 +1,59 @@
 const q = require('./queries.js')
 
 module.exports = {
+    // getPlayerKD: (matchArr) => {
+
+    // },
+    sortMatchStats: (shard, matchArr, playerName) => {
+        // let pAttacks = []
+        // let pHits = []
+        let soloKills = 0
+        let soloDeaths = 0
+        let duoKills = 0
+        let duoDeaths= 0
+        let squadKills = 0
+        let squadDeaths = 0
+        // let pKills = []
+        let deaths = []
+        // let allDeaths = 0
+        // let pDeath = []
+        let teamMates = []
+        let allMatchStats = []
+        let soloKD = []
+        let duoKD = []
+        let squadKD = []
+        //get general stats
+        // console.log(matchArr[0])
+        //get last match telemetry below
+        // console.log(matchArr.length)
+        // sort all-match average stats below
+        allMatchStats = matchArr.map(match => match.included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats)
+        allMatchStats.map(( stats, i ) => {
+            switch(matchArr[i].data.attributes.gameMode) {
+                case ('solo') : {
+                    soloKills += stats.kills
+                    if (stats.deathType !== '') soloDeaths++
+                }
+                    break
+                case ('duo') : {
+                    duoKills += stats.kills
+                    if (stats.deathType !== '') duoDeaths++
+                }
+                    break
+                case ('squad') : {
+                    squadKills += stats.kills
+                    if (stats.deathType !== '') squadDeaths++
+                }
+                    break
+            }
+        })
+        let stats = {}
+        stats.soloKD = isNaN(soloKills / soloDeaths) ? '0.0' : (soloKills/soloDeaths).toFixed(2)
+        console.log('stats', stats)
+        console.log('kills, solo duo squad', soloKills, duoKills, squadKills)
+        console.log('deaths, solo duo squad', soloDeaths, duoDeaths, squadDeaths)
+        return stats
+    },
     sortMatchTelem: (matchArr, playerName) => {
         // console.log('new matcharr', matchArr)
         let matchData = {}
