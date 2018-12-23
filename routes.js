@@ -33,16 +33,24 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 // console.log('match data', matchData[0])
                 let prevMatchData = []
                 let prevMatchAsset = []
+                //populate previous match list below
+                let prevMatchList =[]
+                matchData.map((match, i) => {
+                    if (i < 25) {
+                        prevMatchList.push({ attributes: match.data.attributes, id: match.data.id, stats: match.included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats })
+                    }
+                })
                 prevMatchData.push(matchData[0])
                 prevMatchAsset.push(prevMatchData[0].included.filter(asset => asset.type === 'asset')[0])
                 // prevMatch.push(prevMatchData[0].included)
-                let generalStats = f.sortMatchStats(shard, matchData, playerName)
+                let generalStats = f.sortAllMatchStats(shard, matchData, playerName)
                 // sort match telem below
                 // console.log('stats', generalStats)
                 f.sortMatchTelem(prevMatchAsset, playerName).then(sortedData => {
                     // console.log('telem', sortedData)
                     playerData.prevMatch = sortedData
                     playerData.generalStats = generalStats
+                    playerData.prevMatchList = prevMatchList
                     res.json(playerData)
                 })
                 playerData.TotalMatchesPlayed = baseMatchData.relationships.matches.data.length;
@@ -61,7 +69,11 @@ router.get('/:shard/player/:playerName/match/:matchId/', (req, res, next) => {
 
     q.getMatchData(shard, matchId).then(response => {
         // console.log('get match res', response)
-        res.json(response)
+        let matchAsset = []
+        matchAsset.push(response[0].included.filter(asset => asset.type === 'asset')[0])
+        f.sortMatchTelem(matchAsset, playerName).then(sortedTelem => {
+            res.json(sortedTelem)
+        })
     })
 })
 

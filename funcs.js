@@ -4,7 +4,7 @@ module.exports = {
     // getPlayerKD: (matchArr) => {
 
     // },
-    sortMatchStats: (shard, matchArr, playerName) => {
+    sortAllMatchStats: (shard, matchArr, playerName) => {
         // let pAttacks = []
         // let pHits = []
         let soloKills = 0
