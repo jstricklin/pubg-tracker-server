@@ -62,7 +62,9 @@ module.exports = {
         // ADD RECENT MATCH PERECENT
         let missedAttacks = []
         let enemiesHit = []
+        let sortedHits = []
         let attackers = []
+        // let sortedHits = {}
         let hits = []
         let kills = []
         let killer = []
@@ -89,8 +91,24 @@ module.exports = {
                                     knocks.push(telem)
                                 }
                                 hits.push(telem)
-                                hits.map(hit => {
-                                    if (!enemiesHit.includes(hit.victim.name)) enemiesHit.push(hit.victim.name)
+
+                                hits.map((hit) => {
+                                    // if (!enemiesHit.includes(hit.victim.name)) enemiesHit.push(hit.victim.name)
+                                    // console.log('test vals', !Object.values(sortedHits).filter(val => val.name === hit.victim.name).length)
+                                    if (!Object.values(sortedHits).filter(val => val.name === hit.victim.name).length) {
+                                        let sortedCache = {}
+                                        let cache = hits.filter(el => el.victim.name === hit.victim.name)
+                                        console.log('checking hit cache')
+                                        // console.log('cache', cache)
+                                        cache.map(hitData => {
+                                            sortedCache.name = hitData.victim.name
+                                            sortedCache.weapon = hitData.damageCauserName
+                                            sortedCache.damage = hitData.damage
+                                        })
+                                        sortedHits.push(sortedCache)
+                                    }
+                                    // console.log('sorted cache', sortedCache)
+                                    console.log('sorted hits', sortedHits)
                                 })
                             }
                         }
@@ -130,7 +148,8 @@ module.exports = {
                 // matchData.matchId = matchArr[0].data.id
                 // matchData.stats = allMatchStats[0]
                 // matchData.gameMode = matchArr[0].data.attributes.gameMode
-                matchData.killer = killer;
+                matchData.sortedHits = sortedHits
+                matchData.killer = killer[0];
                 matchData.kills = kills;
                 matchData.attackers = attackers;
                 matchData.enemiesHit = enemiesHit;
