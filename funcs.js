@@ -101,9 +101,15 @@ module.exports = {
                                         console.log('checking hit cache')
                                         // console.log('cache', cache)
                                         cache.map(hitData => {
+                                            console.log('hitData', hitData.victim.name)
                                             sortedCache.name = hitData.victim.name
-                                            sortedCache.weapon = hitData.damageCauserName
-                                            sortedCache.damage = hitData.damage
+                                            if(sortedCache.weapon && sortedCache.weapon[hitData.damageCauserName]){
+                                                // sortedCache.weapon[hitData.damageCauser] += hitData.damage
+                                            } else {
+                                                sortedCache.weapon == hitData.damageCauserName
+                                                console.log('weapon name', hitData.damageCauserName)
+                                                // sortedCache.weapon[hitData.damageCauser] = hitData.damage
+                                            }
                                         })
                                         sortedHits.push(sortedCache)
                                     }
