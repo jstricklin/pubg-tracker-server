@@ -1,5 +1,4 @@
 const q = require('./queries.js')
-
 module.exports = {
     // getPlayerKD: (matchArr) => {
 
@@ -62,7 +61,9 @@ module.exports = {
         // ADD RECENT MATCH PERECENT
         let missedAttacks = []
         let enemiesHit = []
+        let sortedHits = []
         let attackers = []
+        // let sortedHits = {}
         let hits = []
         let kills = []
         let killer = []
@@ -89,9 +90,6 @@ module.exports = {
                                     knocks.push(telem)
                                 }
                                 hits.push(telem)
-                                hits.map(hit => {
-                                    if (!enemiesHit.includes(hit.victim.name)) enemiesHit.push(hit.victim.name)
-                                })
                             }
                         }
                         if (telem.victim && telem.victim.name === playerName && telem.attacker.name !== playerName) {
@@ -117,7 +115,37 @@ module.exports = {
                         teamMates.push(telem.character.name)
                     }
                 })
-
+                // start memoizing data below
+                hits.map((hit) => {
+                    if (!Object.values(sortedHits).filter(val => val.victim.name === hit.victim.name).length) {
+                        let sortedCache = {}
+                        let cache = hits.filter(el => {console.log('filter names', hit.victim.name, el.victim.name ); return el.victim.name === hit.victim.name })
+                        // console.log('checking hit cache')
+                        console.log('cache', cache.length, cache[0].victim.name, cache)
+                        cache.map(hitData => {
+                            // console.log('hitData', hitData.victim.name, hitData)
+                            sortedCache.victim = { name: hitData.victim.name, teamId: hitData.victim.teamId }
+                            // console.log('hitData', hitData)
+                            // console.log('sorted cache weapon check', sortedCache.weapon, hitData.victim.name)
+                            if (sortedCache.weapon && sortedCache.weapon[hitData.damageCauserName]){
+                                console.log('adding weapon damage amt', hitData.damageCauserName)
+                                sortedCache.weapon[hitData.damageCauserName] += hitData.damage
+                            } else if (sortedCache.weapon) {
+                                console.log('adding additional weapon')
+                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
+                            } else {
+                                console.log('adding first weapon', hitData)
+                                sortedCache.weapon = {}
+                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
+                                console.log('first weapon: ', sortedCache)
+                            }
+                        })
+                        // console.log('sortedCache', sortedCache)
+                        sortedHits.push(sortedCache)
+                    }
+                    // console.log('sorted cache', sortedCache)
+                })
+                // end memoizing
                 let accuracy = (hits.length / (missedAttacks.length + hits.length) * 100).toFixed(2);
                 matchData.accuracy = isNaN(accuracy) ? '0.0' : accuracy;
                 matchData.teamMates = teamMates
@@ -130,12 +158,13 @@ module.exports = {
                 // matchData.matchId = matchArr[0].data.id
                 // matchData.stats = allMatchStats[0]
                 // matchData.gameMode = matchArr[0].data.attributes.gameMode
-                matchData.killer = killer;
+                matchData.sortedHits = sortedHits
+                matchData.killer = killer[0];
                 matchData.kills = kills;
                 matchData.attackers = attackers;
-                matchData.enemiesHit = enemiesHit;
                 matchData.knocks = knocks;
                 matchData.knocker = knocker;
+                console.log('sorted hits', sortedHits)
                 return matchData
             })
         }).catch(err => console.log(err))

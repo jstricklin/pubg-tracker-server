@@ -50,7 +50,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                     // console.log('telem', sortedData)
                     playerData.prevMatch = sortedData
                     playerData.generalStats = generalStats
-                    playerData.prevMatchList = prevMatchList
+                    // playerData.prevMatchList = prevMatchList
                     res.json(playerData)
                 })
                 playerData.TotalMatchesPlayed = baseMatchData.relationships.matches.data.length;
