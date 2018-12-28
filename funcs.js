@@ -1,5 +1,4 @@
 const q = require('./queries.js')
-
 module.exports = {
     // getPlayerKD: (matchArr) => {
 
@@ -92,29 +91,36 @@ module.exports = {
                                 }
                                 hits.push(telem)
 
+                                // start memoizing below
                                 hits.map((hit) => {
-                                    // if (!enemiesHit.includes(hit.victim.name)) enemiesHit.push(hit.victim.name)
-                                    // console.log('test vals', !Object.values(sortedHits).filter(val => val.name === hit.victim.name).length)
                                     if (!Object.values(sortedHits).filter(val => val.name === hit.victim.name).length) {
                                         let sortedCache = {}
-                                        let cache = hits.filter(el => el.victim.name === hit.victim.name)
-                                        console.log('checking hit cache')
-                                        // console.log('cache', cache)
+                                        let cache = hits.filter(el => {console.log('filter names', hit.victim.name, el.victim.name ); return el.victim.name === hit.victim.name })
+                                        // console.log('checking hit cache')
+                                        console.log('hits unfiltered', hits)
+                                        // console.log('hits filter', hits.filter(el => el.victim.name === 'One-Eyed-Kakuja'))
+                                        // console.log('test filter', hits.filter(el=> el.victim.name == 'One-Eyed-Kakuja'))
+                                        console.log('cache', cache.length, cache[0].victim.name, cache)
                                         cache.map(hitData => {
-                                            console.log('hitData', hitData.victim.name)
+                                            console.log('hitData', hitData.victim.name, hitData)
                                             sortedCache.name = hitData.victim.name
+                                            // console.log('hitData', hitData)
+                                            // console.log('sorted cache weapon check', sortedCache.weapon, hitData.victim.name)
                                             if(sortedCache.weapon && sortedCache.weapon[hitData.damageCauserName]){
-                                                // sortedCache.weapon[hitData.damageCauser] += hitData.damage
+                                                console.log('adding weapon damage amt', hitData.damageCauserName)
+                                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
+                                            } else if (sortedCache.weapon) {
+                                                console.log('adding additional weapon')
                                             } else {
-                                                sortedCache.weapon == hitData.damageCauserName
-                                                console.log('weapon name', hitData.damageCauserName)
-                                                // sortedCache.weapon[hitData.damageCauser] = hitData.damage
+                                                console.log('adding first weapon', hitData.damageCauserName)
+                                                sortedCache.weapon = hitData.damageCauserName
+                                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
                                             }
                                         })
+                                        // console.log('sortedCache', sortedCache)
                                         sortedHits.push(sortedCache)
                                     }
                                     // console.log('sorted cache', sortedCache)
-                                    console.log('sorted hits', sortedHits)
                                 })
                             }
                         }
@@ -161,6 +167,7 @@ module.exports = {
                 matchData.enemiesHit = enemiesHit;
                 matchData.knocks = knocks;
                 matchData.knocker = knocker;
+                console.log('sorted hits', sortedHits)
                 return matchData
             })
         }).catch(err => console.log(err))
