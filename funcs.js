@@ -117,17 +117,14 @@ module.exports = {
                 })
                 // start memoizing data below
                 hits.map((hit) => {
-                    if (!Object.values(sortedHits).filter(val => val.victim === hit.victim.name).length) {
+                    if (!Object.values(sortedHits).filter(val => val.victim.name === hit.victim.name).length) {
                         let sortedCache = {}
                         let cache = hits.filter(el => {console.log('filter names', hit.victim.name, el.victim.name ); return el.victim.name === hit.victim.name })
                         // console.log('checking hit cache')
-                        // console.log('hits unfiltered', hits)
-                        // console.log('hits filter', hits.filter(el => el.victim.name === 'One-Eyed-Kakuja'))
-                        // console.log('test filter', hits.filter(el=> el.victim.name == 'One-Eyed-Kakuja'))
                         console.log('cache', cache.length, cache[0].victim.name, cache)
                         cache.map(hitData => {
                             // console.log('hitData', hitData.victim.name, hitData)
-                            sortedCache.victim = hitData.victim.name
+                            sortedCache.victim = { name: hitData.victim.name, teamId: hitData.victim.teamId }
                             // console.log('hitData', hitData)
                             // console.log('sorted cache weapon check', sortedCache.weapon, hitData.victim.name)
                             if (sortedCache.weapon && sortedCache.weapon[hitData.damageCauserName]){
