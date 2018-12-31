@@ -47,8 +47,12 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 // sort match telem below
                 // console.log('stats', generalStats)
                 f.sortMatchTelem(prevMatchAsset, playerName).then(sortedData => {
-                    // console.log('telem', sortedData)
-                    playerData.prevMatch = sortedData
+                    sortedData[0].matchStats = prevMatchList[0].stats
+                    sortedData[0].matchId = prevMatchList[0].id
+                    sortedData[0].map = prevMatchList[0].attributes.mapName
+                    sortedData[0].gameMode = prevMatchList[0].attributes.gameMode
+                    sortedData[0].matchTime = prevMatchList[0].attributes.createdAt
+                    playerData.prevMatch = sortedData[0]
                     playerData.generalStats = generalStats
                     // playerData.prevMatchList = prevMatchList
                     res.json(playerData)
@@ -72,6 +76,13 @@ router.get('/:shard/player/:playerName/match/:matchId/', (req, res, next) => {
         let matchAsset = []
         matchAsset.push(response[0].included.filter(asset => asset.type === 'asset')[0])
         f.sortMatchTelem(matchAsset, playerName).then(sortedTelem => {
+            // sortedData[0].matchStats = prevMatchList[0].stats
+            // sortedData[0].matchId = prevMatchList[0].id
+            // sortedData[0].map = prevMatchList[0].attributes.mapName
+            // sortedData[0].gameMode = prevMatchList[0].attributes.gameMode
+            // sortedData[0].matchTime = prevMatchList[0].attributes.createdAt
+            // playerData.prevMatch = sortedData[0]
+            // playerData.generalStats = generalStats
             res.json(sortedTelem)
         })
     })
