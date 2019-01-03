@@ -205,20 +205,28 @@ module.exports = {
                 })
                 // memo knocks
                 knocks.map(knock => {
-                    console.log('knock', knock)
+                    // console.log('knock', knock)
                     let sortKnock = {
-                        victim: { name: knock.victim.name, teamId: knock.victim.teamId },
+                        victim: {
+                            name: knock.victim.name,
+                            teamId: knock.victim.teamId
+                        },
                         weapon: knock.damageCauserName,
+                        damageReason: knock.damageReason,
                         distance: knock.distance,
                     }
                     sortedKnocks.push(sortKnock)
                 })
                 // memo kills
                 kills.map(kill => {
-                    console.log('kill', kill)
+                    // console.log('kill', kill)
                     let sortKill = {
-                        victim: { name: kill.victim.name, teamId: kill.victim.teamId },
+                        victim: {
+                            name: kill.victim.name,
+                            teamId: kill.victim.teamId
+                        },
                         weapon: kill.damageCauserName,
+                        damageReason: kill.damageReason,
                         distance: kill.distance,
                     }
                     sortedKills.push(sortKill)
@@ -247,7 +255,7 @@ module.exports = {
                 matchData.sortedKnocks = sortedKnocks;
                 matchData.sortedKnocker = sortedKnocker;
                 // matchData.knocker = knocker;
-                console.log('sorted hits', sortedHits)
+                // console.log('sorted hits', sortedHits)
                 return matchData
             })
         }).catch(err => console.log(err))

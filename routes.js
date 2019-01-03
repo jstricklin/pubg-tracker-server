@@ -36,7 +36,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 //populate previous match list below
                 let prevMatchList =[]
                 matchData.map((match, i) => {
-                    if (i < 15) {
+                    if (i < 10) {
                         prevMatchList.push({ attributes: match.data.attributes, id: match.data.id, stats: match.included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats })
                     }
                 })
@@ -54,7 +54,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                     sortedData[0].matchTime = prevMatchList[0].attributes.createdAt
                     playerData.prevMatch = sortedData[0]
                     playerData.generalStats = generalStats
-                    // playerData.prevMatchList = prevMatchList
+                    playerData.prevMatchList = prevMatchList
                     res.json(playerData)
                 })
                 playerData.TotalMatchesPlayed = baseMatchData.relationships.matches.data.length;
