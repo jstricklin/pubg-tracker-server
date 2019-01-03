@@ -50,9 +50,9 @@ module.exports = {
         stats.soloKD = isNaN(soloKills / soloDeaths) ? '0.0' : (soloKills/soloDeaths).toFixed(2)
         stats.duoKD = isNaN(duoKills / duoDeaths) ? '0.0' : (duoKills/duoDeaths).toFixed(2)
         stats.squadKD = isNaN(squadKills / squadDeaths) ? '0.0' : (squadKills/squadDeaths).toFixed(2)
-        console.log('stats', stats)
-        console.log('kills, solo duo squad', soloKills, duoKills, squadKills)
-        console.log('deaths, solo duo squad', soloDeaths, duoDeaths, squadDeaths)
+        // console.log('stats', stats)
+        // console.log('kills, solo duo squad', soloKills, duoKills, squadKills)
+        // console.log('deaths, solo duo squad', soloDeaths, duoDeaths, squadDeaths)
         return stats
     },
     sortMatchTelem: (matchArr, playerName) => {
@@ -71,7 +71,7 @@ module.exports = {
         let knocks = []
         let sortedKnocks = []
         let knocker = []
-        let sortedKnocker = {}
+        let sortedKnocker = []
         return q.getMatchTelemetry(matchArr).then(response => {
             return response.map(data => {
                 //get prev match telemetry below
@@ -120,16 +120,17 @@ module.exports = {
                 })
                 // start memoizing data below
                 // memo knocker
-                knocker.length ? sortedKnocker = {
-                    name: knocker[0].attacker.name,
-                    teamId: knocker[0].attacker.teamId,
-                    weapon: knocker[0].damageCauserName,
-                    damageReason: knocker[0].damageReason,
-                    distance: knocker[0].distance,
+                knocker.map(knock => {
+                    sortedKnocker.push({
+                    name: knock.attacker.name,
+                    teamId: knock.attacker.teamId,
+                    weapon: knock.damageCauserName,
+                    damageReason: knock.damageReason,
+                    distance: knock.distance,
                     // knockerLoc: knocker[0].attacker.location,
                     // playerLoc: knocker[0].victim.location
-                }
-                    : sortedKnocker = null
+                    })
+                })
                 // memo killer
                 killer.length ? sortedKiller = {
                     name: killer[0].killer.name,
@@ -145,25 +146,28 @@ module.exports = {
                 attackers.map(attacker => {
                     if (!Object.values(sortedAttackers).filter(val => val.attacker.name === attacker.attacker.name).length) {
                         let sortedCache = {}
-                        let cache = attackers.filter(el => {console.log('filter attacker names', attacker.attacker.name, el.attacker.name ); return el.attacker.name === attacker.attacker.name })
+                        let cache = attackers.filter(el => {
+                            // console.log('filter attacker names', attacker.attacker.name, el.attacker.name );
+                            return el.attacker.name === attacker.attacker.name
+                        })
                         // console.log('checking hit cache')
-                        console.log('attacker cache', cache.length, cache[0].attacker.name, cache)
+                        // console.log('attacker cache', cache.length, cache[0].attacker.name, cache)
                         cache.map(hitData => {
                             // console.log('hitData', hitData.victim.name, hitData)
                             sortedCache.attacker = { name: hitData.attacker.name, teamId: hitData.attacker.teamId }
                             // console.log('hitData', hitData)
                             // console.log('sorted cache weapon check', sortedCache.weapon, hitData.victim.name)
                             if (sortedCache.weapon && sortedCache.weapon[hitData.damageCauserName]){
-                                console.log('adding weapon damage amt', hitData.damageCauserName)
+                                // console.log('adding weapon damage amt', hitData.damageCauserName)
                                 sortedCache.weapon[hitData.damageCauserName] += hitData.damage
                             } else if (sortedCache.weapon) {
-                                console.log('adding additional weapon')
+                                // console.log('adding additional weapon')
                                 sortedCache.weapon[hitData.damageCauserName] = hitData.damage
                             } else {
-                                console.log('adding first weapon', hitData)
+                                // console.log('adding first weapon', hitData)
                                 sortedCache.weapon = {}
                                 sortedCache.weapon[hitData.damageCauserName] = hitData.damage
-                                console.log('first weapon: ', sortedCache)
+                                // console.log('first weapon: ', sortedCache)
                             }
                         })
                         // console.log('sortedCache', sortedCache)
