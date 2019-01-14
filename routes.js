@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const queries = require('./queries.js');
 const cors = require('cors')
 const morgan = require('morgan')
 const bodyParser = require('body-parser');
 const f = require('./funcs.js');
 
-let q = require('./queries.js')
+const q = require('./queries.js')
 
 router.use(bodyParser.urlencoded( { extended: false } ));
 router.use(bodyParser.json());
@@ -36,7 +35,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 //populate previous match list below
                 let prevMatchList =[]
                 matchData.map((match, i) => {
-                    if (i < 10) {
+                    if (i < 15) {
                         prevMatchList.push({ attributes: match.data.attributes, id: match.data.id, stats: match.included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats })
                     }
                 })
