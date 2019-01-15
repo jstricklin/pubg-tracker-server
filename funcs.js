@@ -122,13 +122,13 @@ module.exports = {
                 // memo knocker
                 knocker.map(knock => {
                     sortedKnocker.push({
-                    name: knock.attacker.name,
-                    teamId: knock.attacker.teamId,
-                    weapon: knock.damageCauserName,
-                    damageReason: knock.damageReason,
-                    distance: knock.distance,
-                    // knockerLoc: knocker[0].attacker.location,
-                    // playerLoc: knocker[0].victim.location
+                        name: knock.attacker.name,
+                        teamId: knock.attacker.teamId,
+                        weapon: knock.damageCauserName,
+                        damageReason: knock.damageReason,
+                        distance: knock.distance,
+                        // knockerLoc: knocker[0].attacker.location,
+                        // playerLoc: knocker[0].victim.location
                     })
                 })
                 // memo killer
@@ -147,33 +147,26 @@ module.exports = {
                     if (!Object.values(sortedAttackers).filter(val => val.attacker.name === attacker.attacker.name).length) {
                         let sortedCache = {}
                         let cache = attackers.filter(el => {
-                            // console.log('filter attacker names', attacker.attacker.name, el.attacker.name );
                             return el.attacker.name === attacker.attacker.name
                         })
-                        // console.log('checking hit cache')
-                        // console.log('attacker cache', cache.length, cache[0].attacker.name, cache)
                         cache.map(hitData => {
-                            // console.log('hitData', hitData.victim.name, hitData)
                             sortedCache.attacker = { name: hitData.attacker.name, teamId: hitData.attacker.teamId }
-                            // console.log('hitData', hitData)
-                            // console.log('sorted cache weapon check', sortedCache.weapon, hitData.victim.name)
-                            if (sortedCache.weapon && sortedCache.weapon[hitData.damageCauserName]){
-                                // console.log('adding weapon damage amt', hitData.damageCauserName)
-                                sortedCache.weapon[hitData.damageCauserName] += hitData.damage
-                            } else if (sortedCache.weapon) {
-                                // console.log('adding additional weapon')
-                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
+                            if (sortedCache.weapon) {
+                                if (sortedCache.weapon.filter(weapon => weapon.name === hitData.damageCauserName).length > 0) {
+                                    sortedCache.weapon.map(weapon => {if (weapon.name === hitData.damageCauserName) weapon.totalDmg += hitData.damage || 0 })
+                                    // console.log('adding weapon damage', sortedCache.weapon)
+                                } else {
+                                    sortedCache.weapon.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
+                                    // console.log('adding additional weapon', sortedCache.weapon)
+                                }
                             } else {
-                                // console.log('adding first weapon', hitData)
-                                sortedCache.weapon = {}
-                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
-                                // console.log('first weapon: ', sortedCache)
+                                sortedCache.weapon = []
+                                sortedCache.weapon.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
+                                // console.log('adding first weapon', sortedCache.weapon)
                             }
                         })
-                        // console.log('sortedCache', sortedCache)
                         sortedAttackers.push(sortedCache)
                     }
-                    // console.log('sorted cache', sortedCache)
                 })
 
                 // memo hits
@@ -182,34 +175,27 @@ module.exports = {
                     if (!Object.values(sortedHits).filter(val => val.victim.name === hit.victim.name).length) {
                         let sortedCache = {}
                         let cache = hits.filter(el => { return el.victim.name === hit.victim.name })
-                        // console.log('checking hit cache')
-                        // console.log('cache', cache.length, cache[0].victim.name, cache)
                         cache.map(hitData => {
-                            // console.log('hitData', hitData.victim.name, hitData)
                             sortedCache.victim = { name: hitData.victim.name, teamId: hitData.victim.teamId }
-                            // console.log('hitData', hitData)
-                            // console.log('sorted cache weapon check', sortedCache.weapon, hitData.victim.name)
-                            if (sortedCache.weapon && sortedCache.weapon[hitData.damageCauserName]){
-                                // console.log('adding weapon damage amt', hitData.damageCauserName)
-                                sortedCache.weapon[hitData.damageCauserName] += hitData.damage
-                            } else if (sortedCache.weapon) {
-                                // console.log('adding additional weapon')
-                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
+                            if (sortedCache.weapon) {
+                                if (sortedCache.weapon.filter(weapon => weapon.name === hitData.damageCauserName).length > 0) {
+                                    sortedCache.weapon.map(weapon => {if (weapon.name === hitData.damageCauserName) weapon.totalDmg += hitData.damage || 0 })
+                                    // console.log('adding weapon damage', sortedCache.weapon, hitData.damage)
+                                } else {
+                                    sortedCache.weapon.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
+                                    // console.log('adding additional weapon', sortedCache.weapon)
+                                }
                             } else {
-                                // console.log('adding first weapon', hitData)
-                                sortedCache.weapon = {}
-                                sortedCache.weapon[hitData.damageCauserName] = hitData.damage
-                                // console.log('first weapon: ', sortedCache)
+                                sortedCache.weapon = []
+                                sortedCache.weapon.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
+                                // console.log('adding first weapon', sortedCache.weapon)
                             }
                         })
-                        // console.log('sortedCache', sortedCache)
                         sortedHits.push(sortedCache)
                     }
-                    // console.log('sorted cache', sortedCache)
                 })
                 // memo knocks
                 knocks.map(knock => {
-                    // console.log('knock', knock)
                     let sortKnock = {
                         victim: {
                             name: knock.victim.name,
@@ -223,7 +209,6 @@ module.exports = {
                 })
                 // memo kills
                 kills.map(kill => {
-                    // console.log('kill', kill)
                     let sortKill = {
                         victim: {
                             name: kill.victim.name,
