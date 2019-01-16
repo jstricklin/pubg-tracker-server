@@ -45,6 +45,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 let generalStats = f.sortAllMatchStats(shard, matchData, playerName)
                 // sort match telem below
                 // console.log('stats', generalStats)
+                playerData.TotalMatchesPlayed = baseMatchData.relationships.matches.data.length;
                 f.sortMatchTelem(prevMatchAsset, playerName).then(sortedData => {
                     sortedData[0].matchStats = prevMatchList[0].stats;
                     sortedData[0].matchId = prevMatchList[0].id;
@@ -57,7 +58,6 @@ router.get('/:shard/player/:name', (req, res, next) => {
                     playerData.prevMatchList = prevMatchList;
                     res.json(playerData);
                 })
-                // playerData.TotalMatchesPlayed = baseMatchData.relationships.matches.data.length;
             })
         }
     })
