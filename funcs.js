@@ -224,7 +224,7 @@ module.exports = {
                 // end hit memos
                 let accuracy = (hits.length / (missedAttacks.length + hits.length) * 100).toFixed(2);
                 matchData.accuracy = isNaN(accuracy) ? '0.0' : accuracy;
-                matchData.teamMates = teamMates
+                matchData.teamMates = teamMates;
                 // matchData.missedAttacks = missedAttacks;
                 // matchData.attackCount = missedAttacks.length;
                 // matchData.hitCount = hits.length;
@@ -237,7 +237,7 @@ module.exports = {
                 matchData.killer = sortedKiller;
                 // matchData.unsortKiller = killer[0]
                 // matchData.kills = kills;
-                matchData.sortedKills = sortedKills
+                matchData.sortedKills = sortedKills;
                 // matchData.attackers = attackers;
                 matchData.sortedAttackers = sortedAttackers;
                 // matchData.knocks = knocks;
@@ -245,7 +245,7 @@ module.exports = {
                 matchData.sortedKnocker = sortedKnocker;
                 // matchData.knocker = knocker;
                 // console.log('sorted hits', sortedHits)
-                return matchData
+                return matchData;
             })
         }).catch(err => console.log(err))
     }
