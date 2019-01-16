@@ -154,15 +154,15 @@ module.exports = {
                             if (sortedCache.weapons) {
                                 if (sortedCache.weapons.filter(weapon => weapon.name === hitData.damageCauserName).length > 0) {
                                     sortedCache.weapons.map(weapon => {if (weapon.name === hitData.damageCauserName) weapon.totalDmg += hitData.damage || 0 })
-                                    // console.log('adding weapon damage', sortedCache.weapon)
+                                    console.log('adding weapon damage', sortedCache.weapon, hitData.damage)
                                 } else {
-                                    sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
+                                    sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage || 0 })
                                     // console.log('adding additional weapon', sortedCache.weapon)
                                 }
                             } else {
                                 sortedCache.weapons = []
-                                sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
-                                // console.log('adding first weapon', sortedCache.weapon)
+                                sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage || 0 })
+                                console.log('adding first weapon', sortedCache.weapon, hitData)
                             }
                         })
                         sortedAttackers.push(sortedCache)
@@ -182,12 +182,12 @@ module.exports = {
                                     sortedCache.weapons.map(weapon => {if (weapon.name === hitData.damageCauserName) weapon.totalDmg += hitData.damage || 0 })
                                     // console.log('adding weapon damage', sortedCache.weapon, hitData.damage)
                                 } else {
-                                    sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
+                                    sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage || 0 })
                                     // console.log('adding additional weapon', sortedCache.weapon)
                                 }
                             } else {
                                 sortedCache.weapons = []
-                                sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage })
+                                sortedCache.weapons.push({ name: hitData.damageCauserName, totalDmg: hitData.damage || 0 })
                                 // console.log('adding first weapon', sortedCache.weapon)
                             }
                         })
