@@ -75,10 +75,10 @@ router.get('/:shard/player/:playerName/match/:matchId/', (req, res, next) => {
     q.getMatchData(shard, matchId).then(match => {
         // console.log('get match res', response)
         let matchAsset = []
-        console.log('match', match)
+        console.log('match', match[0])
         matchAsset.push(match[0].included.filter(asset => asset.type === 'asset')[0])
         f.sortMatchTelem(matchAsset, playerName).then(sortedData => {
-            sortedData[0].matchStats = match[0].stats
+            sortedData[0].matchStats = match[0].included.filter(data => data.type === 'participant' && data.attributes.stats.name === playerName)[0].attributes.stats
             sortedData[0].matchId = match[0].id
             sortedData[0].map = match[0].data.attributes.mapName
             sortedData[0].gameMode = match[0].data.attributes.gameMode
