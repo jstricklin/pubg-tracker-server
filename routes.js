@@ -41,7 +41,7 @@ router.get('/:shard/player/:name', (req, res, next) => {
                 })
                 prevMatchData.push(matchData[0])
                 prevMatchAsset.push(prevMatchData[0].included.filter(asset => asset.type === 'asset')[0])
-                // prevMatch.push(prevMatchData[0].included)
+                // generalStats is K/D for now
                 let generalStats = f.sortAllMatchStats(shard, matchData, playerName)
                 // sort match telem below
                 // console.log('stats', generalStats)
@@ -68,22 +68,25 @@ router.get('/:shard/player/:playerName/match/:matchId/', (req, res, next) => {
     let playerName = req.params.playerName
     let matchId = []
     matchId.push({id: req.params.matchId})
+    let matchData = {}
 
     console.log('match route hit')
 
-    q.getMatchData(shard, matchId).then(response => {
+    q.getMatchData(shard, matchId).then(match => {
         // console.log('get match res', response)
         let matchAsset = []
-        matchAsset.push(response[0].included.filter(asset => asset.type === 'asset')[0])
-        f.sortMatchTelem(matchAsset, playerName).then(sortedTelem => {
-            // sortedData[0].matchStats = prevMatchList[0].stats
-            // sortedData[0].matchId = prevMatchList[0].id
-            // sortedData[0].map = prevMatchList[0].attributes.mapName
-            // sortedData[0].gameMode = prevMatchList[0].attributes.gameMode
-            // sortedData[0].matchTime = prevMatchList[0].attributes.createdAt
-            // playerData.prevMatch = sortedData[0]
-            // playerData.generalStats = generalStats
-            res.json(sortedTelem)
+        console.log('match', match)
+        matchAsset.push(match[0].included.filter(asset => asset.type === 'asset')[0])
+        f.sortMatchTelem(matchAsset, playerName).then(sortedData => {
+            sortedData[0].matchStats = match[0].stats
+            sortedData[0].matchId = match[0].id
+            sortedData[0].map = match[0].data.attributes.mapName
+            sortedData[0].gameMode = match[0].data.attributes.gameMode
+            sortedData[0].matchTime = match[0].data.attributes.createdAt
+            matchData.prevMatch = sortedData[0]
+            // matchData.generalStats = generalStats
+            matchData = (sortedData[0])
+            res.json(matchData)
         })
     })
 })
