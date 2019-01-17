@@ -83,6 +83,7 @@ router.get('/:shard/player/:playerName/match/:matchId/', (req, res, next) => {
             sortedData[0].map = match[0].data.attributes.mapName
             sortedData[0].gameMode = match[0].data.attributes.gameMode
             sortedData[0].matchTime = match[0].data.attributes.createdAt
+            sortedData[0].shard = shard;
             matchData.prevMatch = sortedData[0]
             // matchData.generalStats = generalStats
             matchData = (sortedData[0])
