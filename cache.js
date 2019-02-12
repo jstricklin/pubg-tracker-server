@@ -8,7 +8,7 @@ client.keysAsync('*').then( res => console.log('start keys', res) ) // check key
 
 module.exports = {
     getCachedPlayerData: (playerName) => {
-        client.keysAsync('*')
+        // client.keysAsync('*')
             // .then( res => console.log('get data all keys', res) );
         return client.getAsync(playerName).then( res => JSON.parse(res))
     },
